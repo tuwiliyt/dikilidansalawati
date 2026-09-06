@@ -8,6 +8,7 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <title>Dikili dan Salawati</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
     <style>
@@ -36,16 +37,28 @@
             user-select: none;
             -webkit-tap-highlight-color: transparent;
             overflow-x: hidden;
+            position: relative;
         }
 
-        /* ========== ISLAMIC PATTERN BG ========== */
+        /* ========== RICH ISLAMIC PATTERN BACKGROUND ========== */
         body::before {
             content: '';
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
             background-image:
-                url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0L35 10L30 20L25 10Z' fill='%23c9a84c' opacity='0.04'/%3E%3Cpath d='M0 30L10 25L20 30L10 35Z' fill='%23c9a84c' opacity='0.04'/%3E%3Cpath d='M30 40L35 50L30 60L25 50Z' fill='%23c9a84c' opacity='0.04'/%3E%3Cpath d='M40 30L50 25L60 30L50 35Z' fill='%23c9a84c' opacity='0.04'/%3E%3C/svg%3E");
-            background-size: 60px 60px;
+                url("data:image/svg+xml,%3Csvg width='120' height='120' viewBox='0 0 120 120' xmlns='http://www.w3.org/2000/svg'%3E%3C!-- 8-pointed star --%3E%3Cpath d='M60 20 L67 40 L87 33 L80 53 L100 60 L80 67 L87 87 L67 80 L60 100 L53 80 L33 87 L40 67 L20 60 L40 53 L33 33 L53 40 Z' stroke='%23c9a84c' stroke-width='0.5' fill='none' opacity='0.07'/%3E%3Ccircle cx='60' cy='60' r='28' stroke='%23c9a84c' stroke-width='0.4' fill='none' opacity='0.05'/%3E%3Ccircle cx='60' cy='60' r='18' stroke='%23c9a84c' stroke-width='0.3' fill='none' opacity='0.04'/%3E%3C/svg%3E");
+            background-size: 120px 120px;
+            z-index: 0;
+            pointer-events: none;
+        }
+        /* Secondary layer: diagonal lattice */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image:
+                url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 20 L20 0' stroke='%23c9a84c' stroke-width='0.3' opacity='0.04'/%3E%3Cpath d='M20 40 L40 20' stroke='%23c9a84c' stroke-width='0.3' opacity='0.04'/%3E%3Cpath d='M0 20 L20 40' stroke='%23c9a84c' stroke-width='0.3' opacity='0.04'/%3E%3Cpath d='M20 0 L40 20' stroke='%23c9a84c' stroke-width='0.3' opacity='0.04'/%3E%3C/svg%3E");
+            background-size: 40px 40px;
             z-index: 0;
             pointer-events: none;
         }
@@ -55,7 +68,7 @@
             position: fixed;
             top: 0; left: 0;
             width: 100vw; height: 100vh;
-            background: linear-gradient(160deg, var(--emerald), #0a2e23, var(--emerald));
+            background: linear-gradient(160deg, #0a2e23, var(--emerald), #0a2e23);
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -72,29 +85,42 @@
             visibility: hidden;
             pointer-events: none;
         }
-        /* Ornamental border lines */
-        #splash-screen::before,
-        #splash-screen::after {
+        /* Ornamental geometric bg on splash */
+        #splash-screen::before {
             content: '';
             position: absolute;
-            left: 50%; transform: translateX(-50%);
-            width: 200px; height: 2px;
-            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image:
+                url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M50 10 L55 25 L70 18 L63 33 L78 38 L63 43 L70 58 L55 51 L50 66 L45 51 L30 58 L37 43 L22 38 L37 33 L30 18 L45 25 Z' stroke='%23c9a84c' stroke-width='0.6' fill='none' opacity='0.12'/%3E%3Ccircle cx='50' cy='38' r='12' stroke='%23c9a84c' stroke-width='0.4' fill='none' opacity='0.08'/%3E%3C/svg%3E");
+            background-size: 100px 100px;
+            z-index: 0;
         }
-        #splash-screen::before { top: 30%; }
-        #splash-screen::after { bottom: 30%; }
+        #splash-screen > * { position: relative; z-index: 1; }
+
+        /* Corner ornaments on splash */
+        .corner-ornament {
+            position: absolute;
+            width: 80px; height: 80px;
+            border-color: var(--gold);
+            border-style: solid;
+            opacity: 0.25;
+        }
+        .corner-tl { top: 20px; left: 20px; border-width: 2px 0 0 2px; border-radius: 8px 0 0 0; }
+        .corner-tr { top: 20px; right: 20px; border-width: 2px 2px 0 0; border-radius: 0 8px 0 0; }
+        .corner-bl { bottom: 20px; left: 20px; border-width: 0 0 2px 2px; border-radius: 0 0 0 8px; }
+        .corner-br { bottom: 20px; right: 20px; border-width: 0 2px 2px 0; border-radius: 0 0 8px 0; }
 
         .splash-ornament {
             font-size: 2.5rem;
             color: var(--gold);
             animation: pulseGlow 2s ease-in-out infinite;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
         .splash-bismillah {
             font-family: 'Amiri', serif;
             font-size: 2rem;
             color: var(--gold-light);
-            margin-bottom: 30px;
+            margin-bottom: 25px;
             animation: fadeInDown 0.8s ease-out;
             text-shadow: 0 2px 10px rgba(201, 168, 76, 0.3);
         }
@@ -108,10 +134,21 @@
             color: var(--gold);
         }
         .splash-divider {
-            width: 80px; height: 1px;
+            width: 120px; height: 1px;
             background: linear-gradient(90deg, transparent, var(--gold), transparent);
             margin: 18px 0;
             animation: fadeIn 1s ease-out 0.4s both;
+            position: relative;
+        }
+        .splash-divider::after {
+            content: '◆';
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            color: var(--gold);
+            font-size: 8px;
+            background: #0a2e23;
+            padding: 0 8px;
         }
         .splash-subtitle {
             font-size: 1rem;
@@ -136,7 +173,7 @@
         }
         @keyframes pulseGlow {
             0%, 100% { text-shadow: 0 0 10px rgba(201,168,76,0.3); }
-            50% { text-shadow: 0 0 25px rgba(201,168,76,0.6); }
+            50% { text-shadow: 0 0 30px rgba(201,168,76,0.7); }
         }
 
         /* ========== HERO SECTION ========== */
@@ -153,14 +190,23 @@
             overflow: hidden;
             z-index: 1;
         }
-        /* Ornamental pattern overlay on hero */
+        /* Multi-layer ornamental overlay on hero */
         .hero::before {
             content: '';
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
-            background-image: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='40' cy='40' r='15' stroke='%23c9a84c' stroke-width='0.5' fill='none' opacity='0.15'/%3E%3Ccircle cx='40' cy='40' r='25' stroke='%23c9a84c' stroke-width='0.3' fill='none' opacity='0.1'/%3E%3Cline x1='40' y1='15' x2='40' y2='65' stroke='%23c9a84c' stroke-width='0.3' opacity='0.08'/%3E%3Cline x1='15' y1='40' x2='65' y2='40' stroke='%23c9a84c' stroke-width='0.3' opacity='0.08'/%3E%3C/svg%3E");
+            background-image:
+                url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='40' cy='40' r='18' stroke='%23c9a84c' stroke-width='0.5' fill='none' opacity='0.12'/%3E%3Ccircle cx='40' cy='40' r='28' stroke='%23c9a84c' stroke-width='0.3' fill='none' opacity='0.08'/%3E%3Cline x1='40' y1='12' x2='40' y2='68' stroke='%23c9a84c' stroke-width='0.3' opacity='0.06'/%3E%3Cline x1='12' y1='40' x2='68' y2='40' stroke='%23c9a84c' stroke-width='0.3' opacity='0.06'/%3E%3Cline x1='20' y1='20' x2='60' y2='60' stroke='%23c9a84c' stroke-width='0.2' opacity='0.05'/%3E%3Cline x1='60' y1='20' x2='20' y2='60' stroke='%23c9a84c' stroke-width='0.2' opacity='0.05'/%3E%3C/svg%3E");
             background-size: 80px 80px;
             z-index: 0;
+        }
+        .hero::after {
+            content: '';
+            position: absolute;
+            bottom: -1px; left: 0; width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, transparent 10%, var(--gold) 50%, transparent 90%);
+            z-index: 2;
         }
         .hero > * { position: relative; z-index: 1; }
 
@@ -177,9 +223,20 @@
             text-shadow: 0 2px 6px rgba(0,0,0,0.3);
         }
         .hero-divider {
-            width: 60px; height: 2px;
+            width: 80px; height: 2px;
             background: linear-gradient(90deg, transparent, var(--gold), transparent);
             margin: 12px auto;
+            position: relative;
+        }
+        .hero-divider::after {
+            content: '✦';
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            color: var(--gold);
+            font-size: 10px;
+            background: var(--emerald-light);
+            padding: 0 6px;
         }
         .hero p {
             font-size: 0.95rem;
@@ -231,6 +288,15 @@
             background: linear-gradient(180deg, var(--gold), var(--gold-dark));
             border-radius: 0 4px 4px 0;
         }
+        /* Subtle corner ornament inside card */
+        .book-card::after {
+            content: '✦';
+            position: absolute;
+            top: 10px; right: 14px;
+            color: var(--gold);
+            opacity: 0.12;
+            font-size: 28px;
+        }
         .book-card:active {
             transform: scale(0.97);
             box-shadow: 0 4px 15px rgba(44, 24, 16, 0.04);
@@ -253,6 +319,7 @@
             flex-shrink: 0;
             border: 1px solid rgba(201,168,76, 0.2);
             box-shadow: inset 0 2px 4px rgba(255,255,255,0.6);
+            position: relative;
         }
         .details h2 {
             margin: 0 0 4px 0;
@@ -295,13 +362,20 @@
             position: relative;
             z-index: 1;
         }
-        .footer::before {
-            content: '◆';
-            display: block;
-            color: var(--gold);
+        .footer-ornament {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .footer-ornament .line {
+            width: 40px; height: 1px;
+            background: linear-gradient(90deg, transparent, var(--gold-dark), transparent);
             opacity: 0.3;
-            margin-bottom: 8px;
-            font-size: 0.6rem;
+        }
+        .footer-ornament .dot {
+            color: var(--gold); opacity: 0.35; font-size: 0.5rem;
         }
     </style>
 </head>
@@ -309,6 +383,10 @@
 
     <!-- SPLASH SCREEN -->
     <div id="splash-screen">
+        <div class="corner-ornament corner-tl"></div>
+        <div class="corner-ornament corner-tr"></div>
+        <div class="corner-ornament corner-bl"></div>
+        <div class="corner-ornament corner-br"></div>
         <div class="splash-ornament">✦</div>
         <div class="splash-bismillah">﷽</div>
         <h1 class="splash-title">Panita Project</h1>
@@ -348,6 +426,11 @@
 
     <!-- FOOTER -->
     <div class="footer">
+        <div class="footer-ornament">
+            <div class="line"></div>
+            <span class="dot">◆</span>
+            <div class="line"></div>
+        </div>
         &copy; 2026 Mansur Martam, Lc., M.Sy. , Panita Project
     </div>
 
