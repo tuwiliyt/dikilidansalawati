@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#0d3b2e">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Dikili & Salawati</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="lib/pdfjs/pdf_viewer.css">
+    <style>
+        :root {
+            --emerald: #0d3b2e;
+            --emerald-light: #155e4a;
+            --gold: #c9a84c;
+            --gold-light: #e8d08c;
+            --gold-dark: #9c7b2e;
+            --cream: #faf6ed;
+            --cream-dark: #f0e8d4;
+
+            --bg: var(--cream);
+            --text: #2c1810;
+            --header-bg: var(--emerald);
+            --header-text: #ffffff;
+            --toolbar-bg: rgba(250, 246, 237, 0.95);
+            --toolbar-text: #2c1810;
+            --card-shadow: 0 4px 15px rgba(44,24,16,0.08);
+        }
+        body.dark-mode {
+            --bg: #1a1510;
+            --text: #e5dfd5;
+            --header-bg: #0a1e17;
+            --toolbar-bg: rgba(26, 21, 16, 0.95);
+            --toolbar-text: #e5dfd5;
+            --card-shadow: 0 4px 15px rgba(0,0,0,0.4);
+        }
+        body.dark-mode .page-container {
+            filter: invert(0.92) hue-rotate(180deg);
+        }
+
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body, html {
+            height: 100%;
+            background-color: var(--bg);
+            font-family: 'Poppins', sans-serif;
+            overflow: hidden;
+            transition: background-color 0.4s;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* ========== HEADER ========== */
+        .header {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%;
+            height: calc(56px + env(safe-area-inset-top));
+            padding-top: env(safe-area-inset-top);
+            background: var(--header-bg);
+            color: var(--header-text);
+            display: flex;
+            align-items: center;
+            padding-left: 12px;
+            padding-right: 12px;
+            z-index: 100;
+            box-shadow: 0 4px 20px rgba(13, 59, 46, 0.3);
+            transition: background 0.4s;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+        /* Gold ornamental line at bottom of header */
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0;
+            width: 100%; height: 2px;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+        }
+        .header .back-btn {
+            color: var(--gold-light);
+            text-decoration: none;
+            font-size: 1.3rem;
+            margin-right: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 38px; height: 38px;
+            border-radius: 12px;
+            transition: background 0.2s;
+        }
+        .header .back-btn:active {
+            background: rgba(201,168,76,0.15);
+        }
+        .title {
+            font-size: 1rem;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            flex: 1;
+            letter-spacing: 0.3px;
+        }
+
+        /* ========== VIEWER ========== */
+        #viewerContainer {
+            width: 100%;
+            height: 100%;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding-top: calc(56px + env(safe-area-inset-top));
+            padding-bottom: calc(110px + env(safe-area-inset-bottom));
+            position: absolute;
+            top: 0; left: 0;
+            scroll-behavior: smooth;
+            /* Islamic subtle pattern on background */
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0L35 10L30 20L25 10Z' fill='%23c9a84c' opacity='0.03'/%3E%3Cpath d='M0 30L10 25L20 30L10 35Z' fill='%23c9a84c' opacity='0.03'/%3E%3Cpath d='M30 40L35 50L30 60L25 50Z' fill='%23c9a84c' opacity='0.03'/%3E%3Cpath d='M40 30L50 25L60 30L50 35Z' fill='%23c9a84c' opacity='0.03'/%3E%3C/svg%3E");
+            background-size: 60px 60px;
+        }
+
+        #pdfViewer {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transform-origin: top center;
+            transition: transform 0.25s ease-out;
+        }
+
+        .page-container {
+            position: relative;
+            margin: 12px auto;
+            background: white;
+            box-shadow: var(--card-shadow);
+            border-radius: 6px;
+            overflow: hidden;
+            max-width: 800px;
+            transition: box-shadow 0.3s;
+            border: 1px solid rgba(201,168,76,0.1);
+        }
+        canvas {
+            display: block;
+            width: 100% !important;
+            height: auto !important;
+        }
+        .textLayer {
+            position: absolute;
+            left: 0; top: 0; right: 0; bottom: 0;
+            overflow: hidden;
+            line-height: 1.0;
+        }
+        .textLayer span {
+            color: transparent;
+            position: absolute;
+            white-space: pre;
+            cursor: text;
+            transform-origin: 0% 0%;
+        }
+
+        .loading {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1rem;
+            color: var(--text);
+            z-index: 50;
+            background: var(--toolbar-bg);
+            padding: 15px 30px;
+            border-radius: 30px;
+            box-shadow: var(--card-shadow);
+            font-weight: 500;
+            border: 1px solid rgba(201,168,76,0.15);
+        }
+
+        /* ========== BOTTOM TOOLBAR (Islami) ========== */
+        .bottom-toolbar {
+            position: fixed;
+            bottom: 0; left: 0;
+            width: 100%;
+            background: var(--toolbar-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-top: 2px solid transparent;
+            border-image: linear-gradient(90deg, transparent, var(--gold), transparent) 1;
+            padding: 14px 18px calc(14px + env(safe-area-inset-bottom));
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            box-shadow: 0 -4px 25px rgba(44,24,16,0.06);
+            transition: background 0.4s;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.85rem;
+            color: var(--toolbar-text);
+            font-weight: 600;
+        }
+        .slider-container input[type="range"] {
+            flex: 1;
+            accent-color: var(--gold-dark);
+            height: 4px;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+        .controls button {
+            background: transparent;
+            border: 1px solid rgba(201,168,76,0.2);
+            color: var(--toolbar-text);
+            font-size: 1.1rem;
+            width: 44px; height: 44px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .controls button:active {
+            background: rgba(201,168,76,0.15);
+            transform: scale(0.92);
+        }
+
+        .page-indicator {
+            background: linear-gradient(135deg, var(--emerald), var(--emerald-light));
+            color: var(--gold-light);
+            padding: 6px 16px;
+            border-radius: 12px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            border: 1px solid rgba(201,168,76,0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <a href="index.html" class="back-btn">←</a>
+        <div class="title" id="bookTitle">Memuat...</div>
+    </div>
+
+    <div class="loading" id="loading">Memuat Naskah...</div>
+
+    <div id="viewerContainer">
+        <div id="pdfViewer"></div>
+    </div>
+
+    <div class="bottom-toolbar">
+        <div class="slider-container">
+            <span id="lblPage">1</span>
+            <input type="range" id="pageSlider" min="1" max="1" value="1">
+            <span id="lblTotal">-</span>
+        </div>
+        <div class="controls">
+            <button id="btnDark" title="Mode Gelap">🌙</button>
+            <button id="btnZoomOut" title="Perkecil">➖</button>
+            <div class="page-indicator" id="pageIndicator" style="display: none;">1 / -</div>
+            <button id="btnZoomIn" title="Perbesar">➕</button>
+            <button id="btnFull" title="Layar Penuh">⛶</button>
+        </div>
+    </div>
+
+    <script src="lib/pdfjs/pdf.min.js"></script>
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'lib/pdfjs/pdf.worker.min.js';
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const bookId = urlParams.get('book');
+
+        const books = {
+            'dikili': { title: 'Dikili Lo Hulondalo', file: 'data/dikili.pdf' },
+            'salawati': { title: 'Buku Lo Salawati', file: 'data/salawati.pdf' }
+        };
+
+        const book = books[bookId];
+        let pdfDoc = null;
+        let currentScale = 1.0;
+
+        const container = document.getElementById('viewerContainer');
+        const viewer = document.getElementById('pdfViewer');
+        const indicator = document.getElementById('pageIndicator');
+        const loading = document.getElementById('loading');
+
+        const slider = document.getElementById('pageSlider');
+        const lblTotal = document.getElementById('lblTotal');
+        const lblPage = document.getElementById('lblPage');
+
+        if (!book) {
+            document.getElementById('bookTitle').innerText = "Buku tidak ditemukan";
+            loading.innerText = "Naskah tidak ditemukan.";
+        } else {
+            document.getElementById('bookTitle').innerText = book.title;
+
+            pdfjsLib.getDocument(book.file).promise.then(function(pdf) {
+                pdfDoc = pdf;
+                loading.style.display = 'none';
+                indicator.style.display = 'block';
+                indicator.innerText = `1 / ${pdf.numPages}`;
+
+                slider.max = pdf.numPages;
+                lblTotal.innerText = pdf.numPages;
+
+                renderAllPages();
+            }).catch(function(error) {
+                loading.innerText = "Gagal memuat naskah.";
+                console.error(error);
+            });
+        }
+
+        async function renderAllPages() {
+            for (let i = 1; i <= pdfDoc.numPages; i++) {
+                const pageWrapper = document.createElement('div');
+                pageWrapper.className = 'page-container';
+                pageWrapper.id = `page-${i}`;
+                pageWrapper.dataset.pageNumber = i;
+                pageWrapper.style.minHeight = "60vh";
+                viewer.appendChild(pageWrapper);
+            }
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const wrapper = entry.target;
+                        if (!wrapper.dataset.rendered) {
+                            wrapper.dataset.rendered = "true";
+                            renderPage(wrapper).catch(console.error);
+                        }
+                    }
+                });
+            }, { root: container, rootMargin: "150% 0px" });
+
+            document.querySelectorAll('.page-container').forEach(page => {
+                observer.observe(page);
+            });
+
+            container.addEventListener('scroll', () => {
+                let foundPage = parseInt(slider.value);
+                const wrappers = document.querySelectorAll('.page-container');
+                for (let i = 0; i < wrappers.length; i++) {
+                    const rect = wrappers[i].getBoundingClientRect();
+                    if (rect.top < window.innerHeight / 2 && rect.bottom > window.innerHeight / 2) {
+                        foundPage = i + 1;
+                        break;
+                    }
+                }
+                indicator.innerText = `${foundPage} / ${pdfDoc.numPages}`;
+                lblPage.innerText = foundPage;
+                if (slider.value != foundPage) slider.value = foundPage;
+            });
+        }
+
+        async function renderPage(wrapper) {
+            const pageNum = parseInt(wrapper.dataset.pageNumber);
+            const page = await pdfDoc.getPage(pageNum);
+
+            let desiredWidth = container.clientWidth - 30;
+            if (desiredWidth > 800) desiredWidth = 800;
+
+            const viewport = page.getViewport({ scale: 1.0 });
+            const scale = desiredWidth / viewport.width;
+            const scaledViewport = page.getViewport({ scale: scale });
+
+            wrapper.style.width = `${scaledViewport.width}px`;
+            wrapper.style.height = `${scaledViewport.height}px`;
+            wrapper.style.minHeight = "auto";
+
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d');
+
+            const outputScale = window.devicePixelRatio || 1;
+            canvas.width = Math.floor(scaledViewport.width * outputScale);
+            canvas.height = Math.floor(scaledViewport.height * outputScale);
+            canvas.style.width = "100%";
+            canvas.style.height = "100%";
+
+            const transform = outputScale !== 1
+              ? [outputScale, 0, 0, outputScale, 0, 0]
+              : null;
+
+            wrapper.appendChild(canvas);
+
+            const renderContext = {
+                canvasContext: context,
+                transform: transform,
+                viewport: scaledViewport
+            };
+
+            await page.render(renderContext).promise;
+
+            const textContent = await page.getTextContent();
+            const textLayerDiv = document.createElement('div');
+            textLayerDiv.className = 'textLayer';
+
+            textLayerDiv.style.width = `${scaledViewport.width}px`;
+            textLayerDiv.style.height = `${scaledViewport.height}px`;
+
+            wrapper.appendChild(textLayerDiv);
+            textLayerDiv.style.setProperty("--scale-factor", scale);
+
+            try {
+                await pdfjsLib.renderTextLayer({
+                    textContentSource: textContent,
+                    container: textLayerDiv,
+                    viewport: scaledViewport,
+                    textDivs: []
+                }).promise;
+            } catch(e) {
+                console.warn(e);
+            }
+        }
+
+        // Feature Controls
+        slider.addEventListener('input', (e) => {
+            const page = e.target.value;
+            lblPage.innerText = page;
+            const targetEl = document.getElementById(`page-${page}`);
+            if (targetEl) {
+                targetEl.scrollIntoView();
+            }
+        });
+
+        document.getElementById('btnZoomIn').addEventListener('click', () => {
+            currentScale += 0.2;
+            viewer.style.transform = `scale(${currentScale})`;
+        });
+
+        document.getElementById('btnZoomOut').addEventListener('click', () => {
+            if (currentScale > 0.4) {
+                currentScale -= 0.2;
+                viewer.style.transform = `scale(${currentScale})`;
+            }
+        });
+
+        document.getElementById('btnFull').addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    console.error("Error attempting to enable fullscreen:", err);
+                });
+            } else {
+                document.exitFullscreen();
+            }
+        });
+
+        document.getElementById('btnDark').addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            if (document.body.classList.contains('dark-mode')) {
+                document.getElementById('btnDark').innerText = '☀️';
+            } else {
+                document.getElementById('btnDark').innerText = '🌙';
+            }
+        });
+    </script>
+</body>
+</html>

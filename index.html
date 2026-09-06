@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#0d3b2e">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="manifest.json">
+    <title>Dikili dan Salawati</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --emerald: #0d3b2e;
+            --emerald-light: #155e4a;
+            --gold: #c9a84c;
+            --gold-light: #e8d08c;
+            --gold-dark: #9c7b2e;
+            --cream: #faf6ed;
+            --cream-dark: #f0e8d4;
+            --text-main: #2c1810;
+            --text-muted: #7a6b5d;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--cream);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            -webkit-user-select: none;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            overflow-x: hidden;
+        }
+
+        /* ========== ISLAMIC PATTERN BG ========== */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image:
+                url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0L35 10L30 20L25 10Z' fill='%23c9a84c' opacity='0.04'/%3E%3Cpath d='M0 30L10 25L20 30L10 35Z' fill='%23c9a84c' opacity='0.04'/%3E%3Cpath d='M30 40L35 50L30 60L25 50Z' fill='%23c9a84c' opacity='0.04'/%3E%3Cpath d='M40 30L50 25L60 30L50 35Z' fill='%23c9a84c' opacity='0.04'/%3E%3C/svg%3E");
+            background-size: 60px 60px;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* ========== SPLASH SCREEN ========== */
+        #splash-screen {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            background: linear-gradient(160deg, var(--emerald), #0a2e23, var(--emerald));
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            color: white;
+            transition: opacity 0.8s ease-out, visibility 0.8s ease-out;
+            text-align: center;
+            padding: 20px;
+            overflow: hidden;
+        }
+        #splash-screen.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+        /* Ornamental border lines */
+        #splash-screen::before,
+        #splash-screen::after {
+            content: '';
+            position: absolute;
+            left: 50%; transform: translateX(-50%);
+            width: 200px; height: 2px;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+        }
+        #splash-screen::before { top: 30%; }
+        #splash-screen::after { bottom: 30%; }
+
+        .splash-ornament {
+            font-size: 2.5rem;
+            color: var(--gold);
+            animation: pulseGlow 2s ease-in-out infinite;
+            margin-bottom: 20px;
+        }
+        .splash-bismillah {
+            font-family: 'Amiri', serif;
+            font-size: 2rem;
+            color: var(--gold-light);
+            margin-bottom: 30px;
+            animation: fadeInDown 0.8s ease-out;
+            text-shadow: 0 2px 10px rgba(201, 168, 76, 0.3);
+        }
+        .splash-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-shadow: 0 4px 20px rgba(0,0,0,0.4);
+            animation: fadeInDown 0.8s ease-out 0.2s both;
+            color: var(--gold);
+        }
+        .splash-divider {
+            width: 80px; height: 1px;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+            margin: 18px 0;
+            animation: fadeIn 1s ease-out 0.4s both;
+        }
+        .splash-subtitle {
+            font-size: 1rem;
+            font-weight: 300;
+            opacity: 0.9;
+            animation: fadeInUp 0.8s ease-out 0.5s both;
+            line-height: 1.8;
+            color: var(--gold-light);
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-25px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(25px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes pulseGlow {
+            0%, 100% { text-shadow: 0 0 10px rgba(201,168,76,0.3); }
+            50% { text-shadow: 0 0 25px rgba(201,168,76,0.6); }
+        }
+
+        /* ========== HERO SECTION ========== */
+        .hero {
+            background: linear-gradient(160deg, var(--emerald), var(--emerald-light));
+            color: white;
+            width: 100%;
+            padding: calc(50px + env(safe-area-inset-top)) 20px 60px;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(13, 59, 46, 0.4);
+            border-bottom-left-radius: 40px;
+            border-bottom-right-radius: 40px;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+        /* Ornamental pattern overlay on hero */
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='40' cy='40' r='15' stroke='%23c9a84c' stroke-width='0.5' fill='none' opacity='0.15'/%3E%3Ccircle cx='40' cy='40' r='25' stroke='%23c9a84c' stroke-width='0.3' fill='none' opacity='0.1'/%3E%3Cline x1='40' y1='15' x2='40' y2='65' stroke='%23c9a84c' stroke-width='0.3' opacity='0.08'/%3E%3Cline x1='15' y1='40' x2='65' y2='40' stroke='%23c9a84c' stroke-width='0.3' opacity='0.08'/%3E%3C/svg%3E");
+            background-size: 80px 80px;
+            z-index: 0;
+        }
+        .hero > * { position: relative; z-index: 1; }
+
+        .hero-ornament {
+            color: var(--gold);
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 8px rgba(201,168,76,0.4);
+        }
+        .hero h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        }
+        .hero-divider {
+            width: 60px; height: 2px;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+            margin: 12px auto;
+        }
+        .hero p {
+            font-size: 0.95rem;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+
+        /* ========== BOOK CARDS ========== */
+        .container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+            padding: 30px 20px calc(40px + env(safe-area-inset-bottom));
+            width: 100%;
+            max-width: 800px;
+            flex: 1;
+            align-content: flex-start;
+            margin-top: -25px;
+            position: relative;
+            z-index: 10;
+        }
+        @media (min-width: 600px) {
+            .container {
+                grid-template-columns: 1fr 1fr;
+                margin-top: -30px;
+            }
+        }
+
+        .book-card {
+            background: white;
+            border-radius: 20px;
+            padding: 22px;
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            box-shadow: 0 8px 30px rgba(44, 24, 16, 0.06);
+            text-decoration: none;
+            color: var(--text-main);
+            transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s;
+            border: 1px solid var(--cream-dark);
+            position: relative;
+            overflow: hidden;
+        }
+        .book-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 5px; height: 100%;
+            background: linear-gradient(180deg, var(--gold), var(--gold-dark));
+            border-radius: 0 4px 4px 0;
+        }
+        .book-card:active {
+            transform: scale(0.97);
+            box-shadow: 0 4px 15px rgba(44, 24, 16, 0.04);
+        }
+        @media (hover: hover) {
+            .book-card:hover {
+                transform: translateY(-4px);
+                box-shadow: 0 12px 35px rgba(44, 24, 16, 0.1);
+            }
+        }
+
+        .icon {
+            width: 68px; height: 68px;
+            background: linear-gradient(135deg, var(--cream), var(--cream-dark));
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            flex-shrink: 0;
+            border: 1px solid rgba(201,168,76, 0.2);
+            box-shadow: inset 0 2px 4px rgba(255,255,255,0.6);
+        }
+        .details h2 {
+            margin: 0 0 4px 0;
+            font-size: 1.1rem;
+            color: var(--emerald);
+            font-weight: 700;
+        }
+        .details p {
+            margin: 0;
+            color: var(--text-muted);
+            font-size: 0.82rem;
+            line-height: 1.4;
+        }
+        .badge {
+            display: inline-block;
+            margin-top: 8px;
+            background: linear-gradient(135deg, #fdf8ed, #f5edd4);
+            color: var(--gold-dark);
+            font-size: 0.72rem;
+            font-weight: 600;
+            padding: 4px 12px;
+            border-radius: 20px;
+            border: 1px solid rgba(201,168,76,0.2);
+        }
+        .arrow {
+            margin-left: auto;
+            color: var(--gold);
+            font-size: 1.5rem;
+            font-weight: 300;
+        }
+
+        /* ========== FOOTER ========== */
+        .footer {
+            padding: 25px 20px;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.78rem;
+            width: 100%;
+            margin-top: auto;
+            position: relative;
+            z-index: 1;
+        }
+        .footer::before {
+            content: '◆';
+            display: block;
+            color: var(--gold);
+            opacity: 0.3;
+            margin-bottom: 8px;
+            font-size: 0.6rem;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- SPLASH SCREEN -->
+    <div id="splash-screen">
+        <div class="splash-ornament">✦</div>
+        <div class="splash-bismillah">﷽</div>
+        <h1 class="splash-title">Panita Project</h1>
+        <div class="splash-divider"></div>
+        <p class="splash-subtitle">Mansur Martam, Lc., M.Sy<br>@richieoct</p>
+    </div>
+
+    <!-- HERO -->
+    <div class="hero">
+        <div class="hero-ornament">✦</div>
+        <h1>Dikili dan Salawati</h1>
+        <div class="hero-divider"></div>
+        <p>Mansur Martam, Lc., M.Sy.</p>
+    </div>
+
+    <!-- BOOK CARDS -->
+    <div class="container">
+        <a href="reader.html?book=dikili" class="book-card">
+            <div class="icon">📖</div>
+            <div class="details">
+                <h2>Dikili Lo Hulondalo</h2>
+                <p>Naskah Gorontalo</p>
+                <span class="badge">122 Halaman</span>
+            </div>
+            <div class="arrow">›</div>
+        </a>
+        <a href="reader.html?book=salawati" class="book-card">
+            <div class="icon">📘</div>
+            <div class="details">
+                <h2>Buku Lo Salawati</h2>
+                <p>Naskah Gorontalo</p>
+                <span class="badge">16 Halaman</span>
+            </div>
+            <div class="arrow">›</div>
+        </a>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="footer">
+        &copy; 2026 Mansur Martam, Lc., M.Sy. , Panita Project
+    </div>
+
+    <script>
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.getElementById('splash-screen').classList.add('hidden');
+            }, 2800);
+        });
+    </script>
+</body>
+</html>
